@@ -1,26 +1,27 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Route, Switch, Redirect, BrowserRouter as Router } from 'react-router-dom';
+import { ROUTES } from './routes';
+import { TokenPage } from './pages/Token';
+import { ScenarioPage } from './pages/Scenario';
+import { ConfigPage } from './pages/Config';
+import { MainPage } from './pages/Main';
+import './App.scss';
+import { BasicLayout } from './components/BasicLayout';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+export interface IAppProps {}
 
-export default App;
+export const App: React.FC<IAppProps> = (props: IAppProps) => {
+    return (
+        <Router>
+            <BasicLayout>
+                <Switch>
+                    <Route path={[ROUTES.TOKEN]} component={TokenPage} />
+                    <Route path={ROUTES.SCENARIO} component={ScenarioPage} />
+                    <Route path={ROUTES.CONFIG} component={ConfigPage} />
+                    <Route path={ROUTES.MAIN} component={MainPage} />
+                    <Redirect to={ROUTES.TOKEN} />
+                </Switch>
+            </BasicLayout>
+        </Router>
+    );
+};

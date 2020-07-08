@@ -1,0 +1,12 @@
+.request-item {
+  &:hover {
+    cursor: pointer
+  }
+}
+.request-item-content{
+  word-break: break-word;
+}
+.requests-list{
+  height: 200px;
+  overflow-y: auto;
+}
