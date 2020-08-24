@@ -1,5 +1,5 @@
-import axios, { AxiosRequestConfig } from 'axios';
-import { Client, NETWORK_TYPES, Deal, DealFile } from './types';
+import axios, { AxiosPromise, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { Client, NETWORK_TYPES, Deal, DealFile, DealParameter, ClientFull } from './types';
 import { getAuthHeaders, getNetworkType } from './utils';
 import { appendRequest } from './services/requests';
 
@@ -12,13 +12,13 @@ export const API_URLS = {
     ],
     [NETWORK_TYPES.Ethereum]: ['http://eth1.kekker.com', 'http://eth2.kekker.com'],
 };
-export const fetchClients = async (type: NETWORK_TYPES): Promise<Client[]> => {
+export const fetchClients = async (type: NETWORK_TYPES): Promise<ClientFull[]> => {
     const currNetwork = API_URLS[type];
     const response = await axios({
         url: `${currNetwork[0]}/api/clients`,
         headers: getAuthHeaders(),
     });
-    return (response.data as Client[]).map((_net, index) => {
+    return (response.data?.data.reverse() as Client[]).map((_net, index) => {
         return {
             ..._net,
             url: currNetwork[index],
@@ -26,20 +26,22 @@ export const fetchClients = async (type: NETWORK_TYPES): Promise<Client[]> => {
     });
 };
 
-export const fetchCreateDealFree = async (deal: object): Promise<string> => {
+export const fetchCreateDealFree = async (
+    deal: object,
+): Promise<{ localDealId: number; queueId: number }> => {
     const type = getNetworkType();
     const axiosParams: AxiosRequestConfig = {
-        url: `${API_URLS[type][0]}/api/dealsfree`,
+        url: `${API_URLS[type][0]}/api/deals`,
         method: 'POST',
         headers: getAuthHeaders(),
         data: deal,
     };
     const response = await axios(axiosParams);
-    return response.data;
+    return response.data as { localDealId: number; queueId: number };
 };
 export const downloadFile = async (dealUid: string, file: DealFile, clientUrl: string) => {
     const axiosParams: AxiosRequestConfig = {
-        url: `${clientUrl}/api/deals/${dealUid}/files/${file.fileUid}`,
+        url: `${clientUrl}/api/files/${file.localId}`,
         responseType: 'blob',
         headers: getAuthHeaders(),
     };
@@ -48,11 +50,11 @@ export const downloadFile = async (dealUid: string, file: DealFile, clientUrl: s
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', file.fileKind);
+    link.setAttribute('download', file.kind);
     link.click();
 };
 
-export const fetchDealByUid = async (dealUid: string, clientUrl?: string): Promise<Deal> => {
+export const fetchDealByUid = async (dealUid: string, clientUrl?: string): Promise<AxiosResponse<Deal>> => {
     const type = getNetworkType();
     const finalUrl = clientUrl || API_URLS[type][0];
     const axiosParams: AxiosRequestConfig = {
@@ -60,49 +62,36 @@ export const fetchDealByUid = async (dealUid: string, clientUrl?: string): Promi
         headers: getAuthHeaders(),
     };
 
-    const response = await axios(axiosParams);
-    appendRequest(axiosParams, clientUrl, response.data);
-    return response.data;
+    return axios(axiosParams);
 };
 interface StatusData {
     status: string;
     dealUid: string;
-    [key: string]: string;
+    parameters?: DealParameter[];
 }
-export const fetchSetSetStatus = async (data: StatusData, clientUrl: string): Promise<Deal> => {
+export const fetchEditDeal = async (data: StatusData, clientUrl: string): Promise<AxiosResponse<Deal>> => {
     const axiosParams: AxiosRequestConfig = {
-        url: `${clientUrl}/api/deals/setstatus`,
+        url: `${clientUrl}/api/deals/${data.dealUid}`,
         headers: getAuthHeaders(),
         method: 'POST',
         data,
     };
 
-    const response = await axios(axiosParams);
-    appendRequest(axiosParams, clientUrl, response.data);
-    return response.data;
+    return axios(axiosParams);
 };
 export const fetchUploadFile = async (
     dealUid: string,
-    fileData: { file: File; recipients?: string[]; fileKind: string },
+    fileData: { file: File },
     clientUrl: string,
-): Promise<Deal> => {
+): Promise<any> => {
     const formData = new FormData();
-    formData.append('DealUid', dealUid);
     formData.append('formFile', fileData.file);
-    if (fileData.recipients) {
-        // TODO TYPO API
-        formData.append('Recievers', JSON.stringify(fileData.recipients));
-    }
-    formData.append('FileKind', fileData.fileKind);
     const axiosParams: AxiosRequestConfig = {
-        url: `${clientUrl}/api/deals/files`,
+        url: `${clientUrl}/api/files`,
         headers: getAuthHeaders(),
         method: 'POST',
         data: formData,
     };
-
     const response = await axios(axiosParams);
-    appendRequest(axiosParams, clientUrl, response.data);
-
-    return response.data;
+    return response;
 };

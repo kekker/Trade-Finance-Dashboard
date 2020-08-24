@@ -1,3 +1,38 @@
 .list-types:hover {
   cursor: pointer
 }
+
+.loading {
+  font-size: 30px;
+  position: fixed;
+  color:black;
+  top: 50%;
+  margin-top: -50px;
+  left:50%;
+  margin-left: -100px;
+  z-index: 9999;
+}
+.loading:before{
+  content: "";
+  position:fixed;
+  top:0;
+  left:0;
+  right: 0;
+  bottom:0;
+  background:rgba(0,0,0,.3)
+}
+
+.loading:after {
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: bottom;
+  animation: ellipsis steps(4,end) 900ms infinite;
+  content: "\2026"; /* ascii code for the ellipsis character */
+  width: 0;
+}
+
+@keyframes ellipsis {
+  to {
+    width: 1em;
+  }
+}

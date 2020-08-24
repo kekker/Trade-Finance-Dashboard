@@ -1,13 +1,14 @@
 import React, { useMemo, useCallback, useEffect, useState } from 'react';
 // @ts-ignore
 import GraphVis from 'react-graph-vis';
-import { Deal, DealHistory, DealTransition } from '../../types';
+import { Deal, DealHistory } from '../../types';
 import { NEW_STATUS, START_STATUS } from '../../scenarios';
 import { fetchCurrentDeal, getNetworkType } from '../../utils';
 import { fetchClients } from '../../api';
+import { useDeal } from '../../hooks/useDeal';
 
 export interface IGraphProps {
-    deal: Deal;
+    url: string;
 }
 
 const options = {
@@ -39,23 +40,26 @@ const isCompleteStatus = (history: DealHistory[], status: string) => {
     return status === START_STATUS || status === NEW_STATUS || history.some(el => el.status === status);
 };
 export const Graph: React.FC<IGraphProps> = (props: IGraphProps) => {
-    const [deal, setDeal] = useState<Deal>();
+    const { url } = props;
+
+    // const [deal, setDeal] = useState<Deal>();
     const [showGraph, setShowGraph] = useState(false);
+    const { deal } = useDeal(url);
     useEffect(() => {
-        const intervalID = setInterval(async () => {
-            const newDeal = await fetchCurrentDeal();
-            if (newDeal.status !== deal?.status) {
-                setDeal({ ...newDeal });
-            }
-        }, 5000);
-        return () => clearInterval(intervalID);
+        // const intervalID = setInterval(async () => {
+        //     const { data: newDeal } = await fetchCurrentDeal();
+        //     if (newDeal.status !== deal?.status) {
+        //         setDeal({ ...newDeal });
+        //     }
+        // }, 5000);
+        // return () => clearInterval(intervalID);
     }, [deal]);
-    const { statusMap = [], history = [] } = deal || {};
+    const { transitions = [], history = [] } = deal || {};
     const graphConfig2 = useMemo(() => {
-        if (statusMap.length) {
+        if (transitions.length) {
             // return { nodes: [], edges: [] };
             const uniqStatuses = Array.from(
-                new Set([...statusMap.map(el => el.status), ...statusMap.map(el => el.statusNext)]),
+                new Set([...transitions.map(el => el.status), ...transitions.map(el => el.statusNext)]),
             );
             const nodes = uniqStatuses.map(status => {
                 return {
@@ -64,7 +68,7 @@ export const Graph: React.FC<IGraphProps> = (props: IGraphProps) => {
                     color: isCompleteStatus(history, status) ? COMPLETE_STYLE : UNCOMPLETE_STYLE,
                 };
             }, []);
-            const edges = statusMap.map(el => {
+            const edges = transitions.map(el => {
                 return { from: el.status, to: el.statusNext };
             }, []);
             setShowGraph(false);
@@ -75,7 +79,7 @@ export const Graph: React.FC<IGraphProps> = (props: IGraphProps) => {
         }
 
         return { nodes: [], edges: [] };
-    }, [history, statusMap]);
+    }, [history, transitions]);
 
     return (
         <div className="h-100">{showGraph ? <GraphVis graph={graphConfig2} options={options} /> : null}</div>

@@ -11,9 +11,9 @@ export const DealInfo: React.FC<IDealProps> = (props: IDealProps) => {
     const { deal, clientUrl } = props;
     const handleDownloadFile = useCallback(
         (file: DealFile) => () => {
-            downloadFile(deal.uid, file, clientUrl);
+            downloadFile(deal.dealId, file, clientUrl);
         },
-        [clientUrl, deal.uid],
+        [clientUrl, deal.dealId],
     );
     return (
         <div>
@@ -23,13 +23,15 @@ export const DealInfo: React.FC<IDealProps> = (props: IDealProps) => {
                 </h4>
             </div>
             <div className="row">
-                <div className="col-3">
+                <div className="col-2">
                     <b>UID:</b>{' '}
                 </div>
-                <div className="col">{deal.uid}</div>
+                <div className="col" style={{ wordBreak: 'break-all' }}>
+                    {deal.dealId}
+                </div>
             </div>
             <div className="row">
-                <div className="col-3">
+                <div className="col-2">
                     <b>STATUS:</b>{' '}
                 </div>
                 <div className="col">{deal.status}</div>
@@ -61,7 +63,7 @@ export const DealInfo: React.FC<IDealProps> = (props: IDealProps) => {
                                     type="button"
                                     className="btn btn-link"
                                     onClick={handleDownloadFile(file)}>
-                                    {file.fileKind}
+                                    {file.kind}
                                 </button>
                             </div>
                         ))

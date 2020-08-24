@@ -19,11 +19,9 @@ export const RequestModal: React.FC<RequestModalProps> = (props: RequestModalPro
                         <div>
                             <b>Request</b>
                         </div>
-                        <div>{`${request.method} ${request.url}`}</div>
+                        <div>{`${request?.response?.config?.method} ${request?.response?.config?.url}`}</div>
                         {request.data ? (
-                            <pre className="request-item-content">
-                                {JSON.stringify(request.data, null, 2)}
-                            </pre>
+                            <pre className="custom-item-content">{JSON.stringify(request.data, null, 2)}</pre>
                         ) : null}
                     </div>
 
@@ -31,14 +29,14 @@ export const RequestModal: React.FC<RequestModalProps> = (props: RequestModalPro
                         <div>
                             <b>Response</b>
                         </div>
-                        <pre className="request-item-content ml-5">
+                        <pre className="custom-item-content ml-5">
                             {JSON.stringify(request.response, null, 2) || 'Empty'}
                         </pre>
                     </div>
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <button className="btn btn-primary" onClick={onHide}>
+                <button type="button" className="btn btn-primary" onClick={onHide}>
                     Close
                 </button>
             </Modal.Footer>

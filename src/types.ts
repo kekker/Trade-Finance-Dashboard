@@ -21,8 +21,12 @@ export const NETWORK_TYPES_LIST = [
 ];
 
 export interface Client {
+    clusterId: string;
+    info: string;
     key: string;
-    data: string;
+    publicCertificate: string;
+}
+export interface ClientFull extends Client {
     url: string;
 }
 
@@ -37,16 +41,20 @@ export interface DealParameter {
 export interface DealTransition {
     status: string;
     statusNext: string;
-    role: Roles;
+    roles: string[];
 }
 export type StatusMap = DealTransition;
 export interface DealFile {
-    fileKind: string;
-    filePath: string;
-    fileUid: string;
-    state: string;
+    appRef: string;
+    kind: string;
+    localId: string;
+    localPath: string;
+    mediaType: string;
+    receivers: string[];
+    status: string;
     version: number;
 }
+
 export interface DealHistory {
     party: {
         key: string;
@@ -59,7 +67,9 @@ export interface DealHistory {
     version: number;
 }
 export interface Deal {
-    uid: string;
+    appRef: string | null;
+    parent: string | null;
+    dealId: string;
     files: DealFile[];
     history: DealHistory[];
     kind: string;
@@ -67,7 +77,7 @@ export interface Deal {
     parties: DealParty[];
     remark: string;
     status: string;
-    statusMap: StatusMap[];
+    // statusMap: StatusMap[];
     transitions?: StatusMap[];
 }
 
@@ -86,7 +96,7 @@ export interface Scenario {
     deal: Partial<Deal>;
 }
 export interface ScenarioParamsItem {
-    changeFields?: string[];
+    changeFields?: boolean;
     title: string;
     description: string;
     needUploadFile?: boolean;
@@ -122,4 +132,13 @@ export const DEFAULT_SCENARIO: ScenarioParamsItem = {
 export interface RequestItem extends AxiosRequestConfig {
     time?: number;
     response?: any;
+}
+
+export interface Event {
+    category: string;
+    dealId: string;
+    event: string;
+    eventUid: string;
+    objectId: string;
+    timestamp: string;
 }

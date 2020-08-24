@@ -7,20 +7,12 @@ import { ArrowDown } from '../../components/ArrowDown';
 import { RequestModal } from '../../components/RequestModal';
 
 export interface IRequestsListProps {
-    clientUrl: string;
+    requests: RequestItem[];
 }
 
 export const RequestsList: React.FC<IRequestsListProps> = (props: IRequestsListProps) => {
-    const { clientUrl } = props;
-    const [requests, setRequests] = useState<RequestItem[]>([]);
+    const { requests } = props;
     const [currentRequest, setCurrentRequest] = useState<RequestItem | null>(null);
-
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            setRequests(getRequests(clientUrl));
-        }, 2000);
-        return () => clearInterval(intervalId);
-    }, [clientUrl]);
 
     const handleShowRequestModal = useCallback(
         (request: RequestItem) => () => {
@@ -37,10 +29,10 @@ export const RequestsList: React.FC<IRequestsListProps> = (props: IRequestsListP
                 <RequestModal request={currentRequest} onHide={handleCloseRequestModal} />
             ) : null}
             <div className="h4 mt-4">
-                <b>Requests</b>
+                <b>{`Requests ${requests?.length ? `(${requests?.length})` : ''}`}</b>
             </div>
             {requests?.length ? (
-                <ul className="list-group requests-list border">
+                <ul className="list-group custom-list border">
                     {requests.map(request => {
                         const time = request.time ? new Date(request.time) : new Date();
                         const renderTime = time.toTimeString().split(' ')[0];
@@ -50,16 +42,12 @@ export const RequestsList: React.FC<IRequestsListProps> = (props: IRequestsListP
                                 role="presentation"
                                 className={cn(['list-group-item request-item'])}
                                 onClick={handleShowRequestModal(request)}>
+                                <div style={{ wordBreak: 'break-all' }}>{request.response?.config?.url}</div>
                                 <div className="d-flex justify-content-between">
-                                    <div>
-                                        <div>{request.url}</div>
-                                        <div className="d-flex justify-content-between">
-                                            <small>{`${renderTime} ${request.method}`}</small>
-                                            <button type="button" className="btn btn-sm btn-link small">
-                                                more
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <small>{`${renderTime} ${request.response?.config?.method}`}</small>
+                                    <button type="button" className="btn btn-sm btn-link small">
+                                        more
+                                    </button>
                                 </div>
                             </li>
                         );

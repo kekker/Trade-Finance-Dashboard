@@ -1,12 +1,15 @@
-.request-item {
+.custom-item {
   &:hover {
     cursor: pointer
   }
 }
-.request-item-content{
+.custom-item-content{
   word-break: break-word;
 }
-.requests-list{
+.custom-list{
   height: 200px;
   overflow-y: auto;
+}
+.action-block{
+  height: 50px;
 }

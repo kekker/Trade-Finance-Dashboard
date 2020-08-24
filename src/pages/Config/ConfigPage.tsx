@@ -2,16 +2,16 @@ import React, { useCallback, useState, useEffect, useMemo } from 'react';
 import cn from 'classnames';
 import { useHistory } from 'react-router-dom';
 import {
-    Client,
     NETWORK_TYPES,
     ROLES_ARR,
     DEFAULT_PARTY,
     DEFAULT_PARAMETER,
     NETWORK_TYPES_LIST,
     Deal,
+    ClientFull,
 } from '../../types';
 import { fetchClients, fetchCreateDealFree } from '../../api';
-import { getCurrentScenario, setDealUid, setNetworkType } from '../../utils';
+import { getCurrentScenario, setNetworkType, waitCreateDeal } from '../../utils';
 import { ROUTES } from '../../routes';
 
 import './style.scss';
@@ -21,7 +21,8 @@ export const ConfigPage: React.FC = () => {
     const scenario = useMemo(getCurrentScenario, []);
     const [deal, setDeal] = useState<Partial<Deal>>({ ...scenario.deal });
     const [type, setType] = useState<NETWORK_TYPES>(NETWORK_TYPES.Quorum);
-    const [clients, setClients] = useState<Client[]>([]);
+    const [clients, setClients] = useState<ClientFull[]>([]);
+    const [showLoading, setShowLoading] = useState<boolean>(false);
 
     const handleAppendParticipant = useCallback(
         e => {
@@ -161,19 +162,27 @@ export const ConfigPage: React.FC = () => {
     const handleClickStart = useCallback(() => {
         (async () => {
             const result = await fetchCreateDealFree(deal);
-            setDealUid(result);
+            setShowLoading(true);
+            await waitCreateDeal(result.queueId, 'http://qrm1.kekker.com');
+            setShowLoading(false);
             history.push(ROUTES.MAIN);
         })();
     }, [deal, history]);
 
     return (
         <div className="row d-flex h-100 justify-content-center align-items-center">
+            {showLoading ? <div className="loading">Processing</div> : null}
             <div className="card col-lg-8 col-md-12 col-sm-12">
                 <div className="card-body">
                     <div>
-                        <h5 className="card-title">Step 3. Configuration scenario</h5>
+                        <h5 className="card-title   ">
+                            <h3>
+                                <b>Step 3.</b>
+                                Configuring the scenario
+                            </h3>
+                        </h5>
                         <div className="mb-3 pb-3 ">
-                            <h6 className="card-title">Technology</h6>
+                            <h5 className="card-title">Technology</h5>
                             <div>
                                 <ul className="list-group list-group-horizontal list-types">
                                     {NETWORK_TYPES_LIST.map(_type => (
@@ -192,7 +201,7 @@ export const ConfigPage: React.FC = () => {
                         </div>
                         {/* Participant */}
                         <div className="mb-3 pb-3 ">
-                            <h6 className="card-title">Parties</h6>
+                            <h5 className="card-title">Parties</h5>
                             <div>
                                 {deal?.parties?.map((party, index) => (
                                     <div className="form-row">
@@ -203,7 +212,7 @@ export const ConfigPage: React.FC = () => {
                                                 onChange={handleSelectParticipantClient(index)}
                                                 value={party.key}>
                                                 {clients.map(_client => (
-                                                    <option value={_client.key}>{_client.data}</option>
+                                                    <option value={_client.key}>{_client.info}</option>
                                                 ))}
                                             </select>
                                         </div>
@@ -245,7 +254,7 @@ export const ConfigPage: React.FC = () => {
                         </div>
                         {/* Parameters */}
                         <div className="mb-3 ">
-                            <h6 className="card-title">Parameters</h6>
+                            <h5 className="card-title">Parameters</h5>
                             <div>
                                 {deal.parameters?.length === 0 ? (
                                     <div className="text-muted mb-3">
@@ -297,12 +306,14 @@ export const ConfigPage: React.FC = () => {
                         </div>
                         {/* STATUSES */}
                         <div className="mb-3 ">
-                            <h6 className="card-title">Status map</h6>
+                            <h5 className="card-title">Status map</h5>
                             <div>
                                 {deal.transitions?.map((statusItem, index) => (
                                     <div
                                         className="form-row"
-                                        key={statusItem.status + statusItem.statusNext + statusItem.role}>
+                                        key={
+                                            statusItem.status + statusItem.statusNext + statusItem.roles?.[0]
+                                        }>
                                         <div className="col-sm-2 col-form-label">{`Status ${index + 1}`}</div>
                                         <div className="form-group col-md-3">
                                             <input
@@ -326,7 +337,7 @@ export const ConfigPage: React.FC = () => {
                                             <select
                                                 className="form-control"
                                                 disabled={!scenario.canChangeStatusMap}
-                                                value={statusItem.role}>
+                                                value={statusItem.roles?.[0]}>
                                                 {ROLES_ARR.map(_role => (
                                                     <option
                                                         value={_role}

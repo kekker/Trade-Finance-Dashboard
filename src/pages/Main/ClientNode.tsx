@@ -1,42 +1,36 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react';
-import { Client, Deal, DEFAULT_SCENARIO, ScenarioParamsItem } from '../../types';
-import { fetchCurrentDeal, getCurrentScenario } from '../../utils';
+import { ClientFull, DEFAULT_SCENARIO, ScenarioParamsItem } from '../../types';
+import { getCurrentScenario, getDealUid } from '../../utils';
 import { DealInfo } from './DealInfo';
 import { NEW_STATUS, START_STATUS } from '../../scenarios';
-import { fetchSetSetStatus, fetchUploadFile } from '../../api';
+import { fetchEditDeal, fetchUploadFile } from '../../api';
 import { ModalSetStatus, ModalSubmitParams } from './ModalSetStatus';
 import { RequestsList } from './RequestsList';
+import { useDeal } from '../../hooks/useDeal';
+import { EventsList } from './EventsList';
 
 export interface ClientNodeProps {
-    client: Client;
+    client: ClientFull;
 }
-const UPDATE = 2000;
 
 export const ClientNode: React.FC<ClientNodeProps> = (props: ClientNodeProps) => {
     const { client } = props;
-    const [isShowModal, setShowModal] = useState(false);
+
+    const [showModalName, setShowModalName] = useState<string>('');
     const [applyStatuses, setApplyStatuses] = useState<string[]>([]);
-    const [deal, setDeal] = useState<Deal>();
     const clientUrl = client?.url || '';
-    const dealUid = deal?.uid || '';
+
+    // const dealUid = deal?.uid || '';
+    const dealUid = getDealUid();
+    const { deal, requests, events, setRequests } = useDeal(clientUrl);
     const dealStatus = deal?.status === START_STATUS ? NEW_STATUS : deal?.status || '';
     const scenario = useMemo(() => {
         return getCurrentScenario();
     }, []);
-    const updateDeal = useCallback(() => {
-        (async () => {
-            if (client.url) {
-                const newDeal = await fetchCurrentDeal(client.url);
-                setDeal(newDeal);
-            }
-        })();
-    }, [client]);
 
     useEffect(() => {
-        if (client?.url) {
-            setInterval(updateDeal, UPDATE);
-        }
-    }, [client, updateDeal]);
+        setApplyStatuses([]);
+    }, [deal?.status]);
 
     const currentRole = useMemo(() => {
         if (deal) {
@@ -47,55 +41,72 @@ export const ClientNode: React.FC<ClientNodeProps> = (props: ClientNodeProps) =>
 
     const nextStatusObjArr = useMemo(() => {
         return (
-            deal?.statusMap.filter(
-                _statusMap => _statusMap.status === dealStatus && _statusMap.role === currentRole,
+            deal?.transitions?.filter(
+                _statusMap =>
+                    _statusMap.status === dealStatus && _statusMap.roles.includes(currentRole || ''),
             ) || []
         );
     }, [currentRole, deal, dealStatus]);
 
-    const handleClickStatusButton = useCallback(() => {
-        setShowModal(true);
-    }, []);
+    const handleClickStatusButton = useCallback(
+        modalName => () => {
+            setShowModalName(modalName);
+        },
+        [],
+    );
     const handleCloseModal = useCallback(() => {
-        setShowModal(false);
+        setShowModalName('');
     }, []);
     const handleSubmitModal = useCallback(
         (nextStatus: string, scenarioParams: ScenarioParamsItem) => (data?: ModalSubmitParams) => {
             setApplyStatuses(statuses => [...statuses, nextStatus]);
             (async () => {
+                let fileObj: any = null;
                 if (data && data.file) {
                     const nativeFileName = data.file.name;
                     const arrSplitFileName = nativeFileName.split('.');
                     const nativeFileExtension = arrSplitFileName.slice(-1);
                     const fileExtension = scenarioParams.fileKindExtension || nativeFileExtension;
                     const fileName = scenarioParams.fileKindName || arrSplitFileName.slice(0, -1);
-
-                    await fetchUploadFile(
+                    const fileResponse = await fetchUploadFile(
                         dealUid,
                         {
                             file: data.file,
-                            fileKind: `${fileName}.${fileExtension}`,
-                            recipients: scenarioParams.recipients,
                         },
                         clientUrl,
                     );
+                    setRequests(fileResponse);
+
+                    fileObj = {
+                        kind: Array.isArray(fileName) ? fileName[0] : fileName,
+                        mediaType: Array.isArray(fileExtension) ? fileExtension[0] : fileExtension,
+                        receivers: scenarioParams.recipients || undefined,
+                        localId: fileResponse.data,
+                    };
                 }
                 if (deal) {
-                    await fetchSetSetStatus(
-                        {
-                            dealUid,
-                            status: nextStatus || '',
-                        },
-                        clientUrl,
-                    );
-                    updateDeal();
+                    const newDeal = {
+                        dealUid,
+                        status: nextStatus || '',
+                        parameters: data?.dealParameters || undefined,
+                    };
+                    if (fileObj) {
+                        // @ts-ignore
+                        newDeal.files = [fileObj];
+                    }
+                    const responseEdit = await fetchEditDeal(newDeal, clientUrl);
+                    setRequests(responseEdit);
                 }
                 handleCloseModal();
             })();
         },
-        [clientUrl, deal, dealUid, handleCloseModal, updateDeal],
+        [clientUrl, deal, dealUid, handleCloseModal, setRequests],
     );
-
+    const isDisabledButton = nextStatusObjArr
+        ? nextStatusObjArr.some(nextStatusObj => {
+              return applyStatuses.includes(nextStatusObj.statusNext);
+          })
+        : false;
     return (
         <div>
             <div className="pt-3">
@@ -120,41 +131,46 @@ export const ClientNode: React.FC<ClientNodeProps> = (props: ClientNodeProps) =>
                             </div>
                             {nextStatusObjArr?.length ? (
                                 nextStatusObjArr.map(nextStatusObj => {
+                                    const { statusNext } = nextStatusObj;
                                     const currScenarioParams =
-                                        scenario.scenario[nextStatusObj.statusNext] || DEFAULT_SCENARIO;
-                                    const isDisabled = applyStatuses.includes(nextStatusObj.statusNext);
+                                        scenario.scenario[statusNext] || DEFAULT_SCENARIO;
                                     return (
-                                        <>
+                                        <div className="action-block">
                                             <button
-                                                disabled={isDisabled}
+                                                disabled={isDisabledButton}
                                                 type="button"
-                                                className="btn btn-primary"
-                                                onClick={handleClickStatusButton}>
-                                                {isDisabled
+                                                className="btn btn-primary mr-2"
+                                                onClick={handleClickStatusButton(statusNext)}>
+                                                {isDisabledButton
                                                     ? 'Processing...'
-                                                    : `Set ${nextStatusObj.statusNext} status`}
+                                                    : `Set ${statusNext} status`}
                                             </button>
-                                            {isShowModal ? (
+                                            {showModalName === statusNext ? (
                                                 <ModalSetStatus
+                                                    deal={deal}
                                                     show
+                                                    size="lg"
                                                     scenarioParams={currScenarioParams}
                                                     onHide={handleCloseModal}
                                                     onSubmit={handleSubmitModal(
-                                                        nextStatusObj.statusNext,
+                                                        statusNext,
                                                         currScenarioParams,
                                                     )}
                                                 />
                                             ) : null}
-                                        </>
+                                        </div>
                                     );
                                 })
                             ) : (
-                                <div>No Actions</div>
+                                <div className="action-block">No Actions</div>
                             )}
+                        </div>
+                        <div>
+                            <EventsList events={events} />
                         </div>
                         {/* REQUESTS */}
                         <div>
-                            <RequestsList clientUrl={clientUrl} />
+                            <RequestsList requests={requests} />
                         </div>
                     </div>
                 ) : (
