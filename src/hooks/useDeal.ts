@@ -3,6 +3,7 @@ import axios from 'axios';
 import { fetchCurrentDeal, getAuthHeaders, getDealUid } from '../utils';
 import { Deal, RequestItem, Event } from '../types';
 
+const INTERVAL_DELAY = 3000;
 export const useDeal = (url: string) => {
     const dealUid = getDealUid();
     const [requests, setStateRequests] = useState<RequestItem[]>([]);
@@ -33,8 +34,10 @@ export const useDeal = (url: string) => {
                     const bDate = new Date(b.timestamp);
                     return Number(aDate) - Number(bDate);
                 });
+                const newEventsIds = sortEvents.map(event => event.eventUid);
                 setEvents(existEvents => {
-                    if (existEvents.length !== sortEvents.length) {
+                    const existEventsIds = existEvents.map(event => event.eventUid);
+                    if (newEventsIds.some(e => !existEventsIds.includes(e))) {
                         return sortEvents;
                     }
                     return existEvents;
@@ -43,7 +46,7 @@ export const useDeal = (url: string) => {
         };
         if (url) {
             intervalFunction();
-            const intervalId = window.setInterval(intervalFunction, 15000);
+            const intervalId = window.setInterval(intervalFunction, INTERVAL_DELAY);
             return () => clearInterval(intervalId);
         }
         return () => null;

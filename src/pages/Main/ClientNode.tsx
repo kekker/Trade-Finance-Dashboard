@@ -130,37 +130,39 @@ export const ClientNode: React.FC<ClientNodeProps> = (props: ClientNodeProps) =>
                                 <b>Actions</b>
                             </div>
                             {nextStatusObjArr?.length ? (
-                                nextStatusObjArr.map(nextStatusObj => {
-                                    const { statusNext } = nextStatusObj;
-                                    const currScenarioParams =
-                                        scenario.scenario[statusNext] || DEFAULT_SCENARIO;
-                                    return (
-                                        <div className="action-block">
-                                            <button
-                                                disabled={isDisabledButton}
-                                                type="button"
-                                                className="btn btn-primary mr-2"
-                                                onClick={handleClickStatusButton(statusNext)}>
-                                                {isDisabledButton
-                                                    ? 'Processing...'
-                                                    : `Set ${statusNext} status`}
-                                            </button>
-                                            {showModalName === statusNext ? (
-                                                <ModalSetStatus
-                                                    deal={deal}
-                                                    show
-                                                    size="lg"
-                                                    scenarioParams={currScenarioParams}
-                                                    onHide={handleCloseModal}
-                                                    onSubmit={handleSubmitModal(
-                                                        statusNext,
-                                                        currScenarioParams,
-                                                    )}
-                                                />
-                                            ) : null}
-                                        </div>
-                                    );
-                                })
+                                <div className="action-block">
+                                    {nextStatusObjArr.map(nextStatusObj => {
+                                        const { statusNext } = nextStatusObj;
+                                        const currScenarioParams =
+                                            scenario.scenario[statusNext] || DEFAULT_SCENARIO;
+                                        return (
+                                            <>
+                                                <button
+                                                    disabled={isDisabledButton}
+                                                    type="button"
+                                                    className="btn btn-primary mr-2"
+                                                    onClick={handleClickStatusButton(statusNext)}>
+                                                    {isDisabledButton
+                                                        ? 'Processing...'
+                                                        : `Set ${statusNext} status`}
+                                                </button>
+                                                {showModalName === statusNext ? (
+                                                    <ModalSetStatus
+                                                        deal={deal}
+                                                        show
+                                                        size="lg"
+                                                        scenarioParams={currScenarioParams}
+                                                        onHide={handleCloseModal}
+                                                        onSubmit={handleSubmitModal(
+                                                            statusNext,
+                                                            currScenarioParams,
+                                                        )}
+                                                    />
+                                                ) : null}
+                                            </>
+                                        );
+                                    })}
+                                </div>
                             ) : (
                                 <div className="action-block">No Actions</div>
                             )}
