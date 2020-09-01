@@ -7,5 +7,14 @@ $btn-font-weight: 600;
 $list-group-active-color: #000;
 $link-color: blue;
 $link-decoration: underline;
+
+$grid-breakpoints: (
+        xs: 0,
+        sm: 576px,
+        md: 768px,
+        lg: 992px,
+        xl: 1440px
+);
+
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/bootstrap';

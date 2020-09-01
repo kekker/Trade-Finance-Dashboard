@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { Deal, DealFile } from '../../types';
 import { downloadFile } from '../../api';
+import './style.scss';
 
 export interface IDealProps {
     deal: Deal;
@@ -23,7 +24,7 @@ export const DealInfo: React.FC<IDealProps> = (props: IDealProps) => {
                 </h4>
             </div>
             <div className="row">
-                <div className="col-2">
+                <div className="col titleWidth">
                     <b>UID:</b>{' '}
                 </div>
                 <div className="col" style={{ wordBreak: 'break-all' }}>
@@ -31,7 +32,7 @@ export const DealInfo: React.FC<IDealProps> = (props: IDealProps) => {
                 </div>
             </div>
             <div className="row">
-                <div className="col-2">
+                <div className="col titleWidth">
                     <b>STATUS:</b>{' '}
                 </div>
                 <div className="col">{deal.status}</div>
@@ -43,7 +44,7 @@ export const DealInfo: React.FC<IDealProps> = (props: IDealProps) => {
             {deal.parameters.map(param => {
                 return (
                     <div className="row">
-                        <div className="col-3">
+                        <div className="col-3 titleWidth">
                             <b>{`${param.key}: `}</b>
                         </div>
                         <div className="col">{param.value}</div>

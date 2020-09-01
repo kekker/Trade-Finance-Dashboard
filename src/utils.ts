@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { SCENARIOS } from './scenarios';
-import { NETWORK_TYPES, Client, ClientFull } from './types';
-import { fetchDealByUid } from './api';
+import { NETWORK_TYPES, ClientFull } from './types';
+import { API_URLS, fetchDealByUid } from './api';
 
 export const getCurrentScenario = () => {
     const scenarioId = localStorage.getItem('scenarioId');
@@ -28,11 +28,13 @@ export const setDealUid = (localDealId: number) => {
 };
 
 export const waitCreateDeal = async (queueId: number, url: string) => {
+    const type = getNetworkType();
     try {
         // eslint-disable-next-line no-constant-condition
         while (true) {
+            // eslint-disable-next-line no-await-in-loop
             const response = await axios({
-                url: `${url}/api/queue/${queueId}`,
+                url: `${API_URLS[type][0]}/api/queue/${queueId}`,
                 headers: getAuthHeaders(),
             });
             // eslint-disable-next-line no-await-in-loop
