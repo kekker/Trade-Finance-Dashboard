@@ -38,7 +38,7 @@ export const RequestsList: React.FC<IRequestsListProps> = (props: IRequestsListP
                         const renderTime = time.toTimeString().split(' ')[0];
                         return (
                             <li
-                                key={renderTime}
+                                key={request.time}
                                 role="presentation"
                                 className={cn(['list-group-item request-item'])}
                                 onClick={handleShowRequestModal(request)}>

@@ -43,7 +43,7 @@ export const DealInfo: React.FC<IDealProps> = (props: IDealProps) => {
             </div>
             {deal.parameters.map(param => {
                 return (
-                    <div className="row">
+                    <div className="row" key={param.key}>
                         <div className="col-3 titleWidth">
                             <b>{`${param.key}: `}</b>
                         </div>

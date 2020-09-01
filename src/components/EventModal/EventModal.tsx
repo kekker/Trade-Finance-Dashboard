@@ -9,6 +9,7 @@ export interface EventModalProps extends ModalProps {
 export const EventModal: React.FC<EventModalProps> = (props: EventModalProps) => {
     const { event, onHide, ...otherProps } = props;
     const { category, dealId, event: eventId, eventUid, timestamp, objectId } = event;
+    console.log(event);
     return (
         <Modal {...otherProps} onHide={onHide} show size="lg">
             <Modal.Header closeButton onHide={onHide}>

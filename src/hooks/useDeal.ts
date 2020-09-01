@@ -23,22 +23,25 @@ export const useDeal = (url: string) => {
     useEffect(() => {
         const intervalFunction = () => {
             axios({
-                url: `${url}/api/events`,
+                // TODO filter not working
+                url: `${url}/api/events?dealKinds=${dealUid}&pageSize=500`,
                 headers: getAuthHeaders(),
             }).then(response => {
                 setRequests(response);
                 const newEvents = (response.data?.data || []) as Event[];
-                const filterEvents = newEvents.filter(event => event.dealId === dealUid);
-                const sortEvents = filterEvents.sort((a, b) => {
-                    const aDate = new Date(a.timestamp);
-                    const bDate = new Date(b.timestamp);
-                    return Number(aDate) - Number(bDate);
-                });
-                const newEventsIds = sortEvents.map(event => event.eventUid);
+                const filterEvents = newEvents.filter(ev => ev.dealId === dealUid || ev.objectId === dealUid);
+                const newEventsIds = filterEvents.map(event => event.eventUid);
                 setEvents(existEvents => {
                     const existEventsIds = existEvents.map(event => event.eventUid);
                     if (newEventsIds.some(e => !existEventsIds.includes(e))) {
-                        return sortEvents;
+                        const filterExistEvents = existEvents.filter(
+                            ev => !newEventsIds.includes(ev.eventUid),
+                        );
+                        return [...filterExistEvents, ...filterEvents].sort((a, b) => {
+                            const aDate = new Date(a.timestamp);
+                            const bDate = new Date(b.timestamp);
+                            return Number(aDate) - Number(bDate);
+                        });
                     }
                     return existEvents;
                 });

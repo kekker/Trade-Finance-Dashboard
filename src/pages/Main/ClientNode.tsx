@@ -136,7 +136,7 @@ export const ClientNode: React.FC<ClientNodeProps> = (props: ClientNodeProps) =>
                                         const currScenarioParams =
                                             scenario.scenario[statusNext] || DEFAULT_SCENARIO;
                                         return (
-                                            <>
+                                            <React.Fragment key={statusNext}>
                                                 <button
                                                     disabled={isDisabledButton}
                                                     type="button"
@@ -159,7 +159,7 @@ export const ClientNode: React.FC<ClientNodeProps> = (props: ClientNodeProps) =>
                                                         )}
                                                     />
                                                 ) : null}
-                                            </>
+                                            </React.Fragment>
                                         );
                                     })}
                                 </div>

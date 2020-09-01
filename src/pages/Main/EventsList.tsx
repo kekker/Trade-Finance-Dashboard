@@ -27,16 +27,18 @@ export const EventsList: React.FC<EventsListProps> = (props: EventsListProps) =>
             </div>
             <ul className="list-group custom-list border">
                 {events.map(event => {
-                    const time = new Date(event.timestamp).toTimeString().split(' ')[0];
+                    const time = new Date(`${event.timestamp}Z`).toTimeString().split(' ')[0];
                     return (
                         <li
-                            key={time}
+                            key={event.eventUid}
                             role="presentation"
                             className={cn(['list-group-item request-item'])}
                             onClick={onClick(event)}>
                             <div>{event.eventUid}</div>
                             <div className="d-flex justify-content-between">
-                                <small>{`${time}`}</small>
+                                <small>
+                                    {event.event} {time}
+                                </small>
                                 <button type="button" className="btn btn-sm btn-link small">
                                     more
                                 </button>
