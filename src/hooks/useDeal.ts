@@ -23,11 +23,9 @@ export const useDeal = (url: string) => {
     useEffect(() => {
         const intervalFunction = () => {
             axios({
-                // TODO filter not working
-                url: `${url}/api/events?dealKinds=${dealUid}&pageSize=500`,
+                url: `${url}/api/events?pageSize=500`,
                 headers: getAuthHeaders(),
             }).then(response => {
-                setRequests(response);
                 const newEvents = (response.data?.data || []) as Event[];
                 const filterEvents = newEvents.filter(ev => ev.dealId === dealUid || ev.objectId === dealUid);
                 const newEventsIds = filterEvents.map(event => event.eventUid);
@@ -37,6 +35,7 @@ export const useDeal = (url: string) => {
                         const filterExistEvents = existEvents.filter(
                             ev => !newEventsIds.includes(ev.eventUid),
                         );
+                        setRequests(response);
                         return [...filterExistEvents, ...filterEvents].sort((a, b) => {
                             const aDate = new Date(a.timestamp);
                             const bDate = new Date(b.timestamp);
