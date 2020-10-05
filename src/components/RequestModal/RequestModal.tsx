@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React from 'react';
 import Modal, { ModalProps } from 'react-bootstrap/Modal';
 import { RequestItem } from '../../types';
 

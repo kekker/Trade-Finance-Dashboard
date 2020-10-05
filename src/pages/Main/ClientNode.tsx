@@ -30,6 +30,7 @@ export const ClientNode: React.FC<ClientNodeProps> = (props: ClientNodeProps) =>
 
     useEffect(() => {
         setApplyStatuses([]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [deal?.status]);
 
     const currentRole = useMemo(() => {

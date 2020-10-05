@@ -1,10 +1,8 @@
-import React, { useMemo, useCallback, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 // @ts-ignore
 import GraphVis from 'react-graph-vis';
-import { Deal, DealHistory } from '../../types';
+import { DealHistory } from '../../types';
 import { NEW_STATUS, START_STATUS } from '../../scenarios';
-import { fetchCurrentDeal, getNetworkType } from '../../utils';
-import { fetchClients } from '../../api';
 import { useDeal } from '../../hooks/useDeal';
 
 export interface IGraphProps {

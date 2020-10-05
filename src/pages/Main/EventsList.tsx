@@ -1,6 +1,6 @@
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import cn from 'classnames';
-import { Event, RequestItem } from '../../types';
+import { Event } from '../../types';
 import { EventModal } from '../../components/EventModal';
 
 export interface EventsListProps {

@@ -1,9 +1,7 @@
-import React, { useCallback, useEffect, useState, MouseEvent } from 'react';
+import React, { useCallback, useState } from 'react';
 import cn from 'classnames';
-import { getRequests } from '../../services/requests';
 import { RequestItem } from '../../types';
 import './style.scss';
-import { ArrowDown } from '../../components/ArrowDown';
 import { RequestModal } from '../../components/RequestModal';
 
 export interface IRequestsListProps {

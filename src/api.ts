@@ -1,4 +1,4 @@
-import axios, { AxiosPromise, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Client, NETWORK_TYPES, Deal, DealFile, DealParameter, ClientFull } from './types';
 import { getAuthHeaders, getNetworkType } from './utils';
 import { appendRequest } from './services/requests';
