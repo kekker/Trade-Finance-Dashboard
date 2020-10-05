@@ -27,7 +27,7 @@ export const setDealUid = (localDealId: number) => {
     localStorage.setItem('dealUid', String(localDealId));
 };
 
-export const waitCreateDeal = async (queueId: number, url: string) => {
+export const waitCreateDeal = async (queueId: number) => {
     const type = getNetworkType();
     try {
         // eslint-disable-next-line no-constant-condition

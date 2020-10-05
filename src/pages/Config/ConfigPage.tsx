@@ -163,8 +163,7 @@ export const ConfigPage: React.FC = () => {
         (async () => {
             const result = await fetchCreateDealFree(deal);
             setShowLoading(true);
-            // TODO
-            await waitCreateDeal(result.queueId, 'https://qrm1.kekker.com');
+            await waitCreateDeal(result.queueId);
             setShowLoading(false);
             history.push(ROUTES.MAIN);
         })();
@@ -186,6 +185,7 @@ export const ConfigPage: React.FC = () => {
                                 <ul className="list-group list-group-horizontal list-types">
                                     {NETWORK_TYPES_LIST.map(_type => (
                                         <li
+                                            key={_type.id}
                                             role="presentation"
                                             className={cn([
                                                 'list-group-item list-group-item-action text-center ',
@@ -203,7 +203,7 @@ export const ConfigPage: React.FC = () => {
                             <h5 className="card-title">Parties</h5>
                             <div>
                                 {deal?.parties?.map((party, index) => (
-                                    <div className="form-row">
+                                    <div key={`${party?.key}${party?.role}`} className="form-row">
                                         <div className="col-sm-2 col-form-label">{`Party ${index + 1}`}</div>
                                         <div className="form-group col-md-5">
                                             <select
@@ -211,7 +211,9 @@ export const ConfigPage: React.FC = () => {
                                                 onChange={handleSelectParticipantClient(index)}
                                                 value={party.key}>
                                                 {clients.map(_client => (
-                                                    <option value={_client.key}>{_client.info}</option>
+                                                    <option key={_client.key} value={_client.key}>
+                                                        {_client.info}
+                                                    </option>
                                                 ))}
                                             </select>
                                         </div>
@@ -223,7 +225,9 @@ export const ConfigPage: React.FC = () => {
                                                 value={party.role}>
                                                 <option> -- Choose Role</option>
                                                 {ROLES_ARR.map(_role => (
-                                                    <option value={_role}>{_role}</option>
+                                                    <option key={_role} value={_role}>
+                                                        {_role}
+                                                    </option>
                                                 ))}
                                             </select>
                                         </div>
@@ -261,7 +265,7 @@ export const ConfigPage: React.FC = () => {
                                     </div>
                                 ) : (
                                     deal.parameters?.map((parameter, index) => (
-                                        <div className="form-row">
+                                        <div key={parameter.key} className="form-row">
                                             <div className="col-sm-2 col-form-label">
                                                 {`Parameter ${index + 1}`}
                                             </div>
@@ -339,6 +343,7 @@ export const ConfigPage: React.FC = () => {
                                                 value={statusItem.roles?.[0]}>
                                                 {ROLES_ARR.map(_role => (
                                                     <option
+                                                        key={_role}
                                                         value={_role}
                                                         disabled={!scenario.canChangeStatusMap}>
                                                         {_role}
