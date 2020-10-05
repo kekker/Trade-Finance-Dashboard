@@ -3,7 +3,7 @@ import axios from 'axios';
 import { fetchCurrentDeal, getAuthHeaders, getDealUid } from '../utils';
 import { Deal, RequestItem, Event } from '../types';
 
-const INTERVAL_DELAY = 3000;
+const INTERVAL_DELAY = 10000;
 export const useDeal = (url: string) => {
     const dealUid = getDealUid();
     const [requests, setStateRequests] = useState<RequestItem[]>([]);
@@ -23,7 +23,7 @@ export const useDeal = (url: string) => {
     useEffect(() => {
         const intervalFunction = () => {
             axios({
-                url: `${url}/api/events?pageSize=500`,
+                url: `${url}/api/events/Deals?pageSize=500`,
                 headers: getAuthHeaders(),
             }).then(response => {
                 const newEvents = (response.data?.data || []) as Event[];
@@ -35,6 +35,13 @@ export const useDeal = (url: string) => {
                         const filterExistEvents = existEvents.filter(
                             ev => !newEventsIds.includes(ev.eventUid),
                         );
+                        for (let i = 0; i < filterEvents.length; i++) {
+                            axios({
+                                url: `${url}/api/events/${filterEvents[i].eventUid}/ack`,
+                                headers: getAuthHeaders(),
+                                method: 'POST',
+                            });
+                        }
                         setRequests(response);
                         return [...filterExistEvents, ...filterEvents].sort((a, b) => {
                             const aDate = new Date(a.timestamp);

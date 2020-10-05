@@ -62,7 +62,7 @@ export const ModalSetStatus: React.FC<IModalSetStatusProps> = (props: IModalSetS
                     <div>
                         {dealParameters.map(dealParameter => {
                             return (
-                                <div className="form-group">
+                                <div className="form-group" key={dealParameter.key}>
                                     <label htmlFor={dealParameter.key}>{dealParameter.key}</label>
                                     <input
                                         id={dealParameter.key}
