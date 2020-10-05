@@ -4,13 +4,13 @@ import { getAuthHeaders, getNetworkType } from './utils';
 import { appendRequest } from './services/requests';
 
 export const API_URLS = {
-    [NETWORK_TYPES.Quorum]: ['http://qrm1.kekker.com', 'http://qrm2.kekker.com', 'http://qrm3.kekker.com'],
+    [NETWORK_TYPES.Quorum]: ['https://qrm1.kekker.com', 'https://qrm2.kekker.com', 'https://qrm3.kekker.com'],
     [NETWORK_TYPES.Hyperledger]: [
-        'http://hlf1.kekker.com',
-        'http://hlf2.kekker.com',
-        'http://hlf3.kekker.com',
+        'https://hlf1.kekker.com',
+        'https://hlf2.kekker.com',
+        'https://hlf3.kekker.com',
     ],
-    [NETWORK_TYPES.Ethereum]: ['http://eth1.kekker.com', 'http://eth2.kekker.com'],
+    [NETWORK_TYPES.Ethereum]: ['https://eth1.kekker.com', 'https://eth2.kekker.com'],
 };
 export const fetchClients = async (type: NETWORK_TYPES): Promise<ClientFull[]> => {
     const currNetwork = API_URLS[type];

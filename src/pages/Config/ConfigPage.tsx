@@ -163,7 +163,8 @@ export const ConfigPage: React.FC = () => {
         (async () => {
             const result = await fetchCreateDealFree(deal);
             setShowLoading(true);
-            await waitCreateDeal(result.queueId, 'http://qrm1.kekker.com');
+            // TODO
+            await waitCreateDeal(result.queueId, 'https://qrm1.kekker.com');
             setShowLoading(false);
             history.push(ROUTES.MAIN);
         })();
