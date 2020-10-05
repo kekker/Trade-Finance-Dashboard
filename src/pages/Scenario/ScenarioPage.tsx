@@ -19,12 +19,10 @@ export const ScenarioPage: React.FC = () => {
         <div className="row d-flex h-100 justify-content-center align-items-center">
             <div className="card col-lg-4 col-md-8 col-sm-10">
                 <div className="card-body">
-                    <h5 className="card-title">
-                        <h3>
-                            <b>Step 2.</b>
-                            Scenario
-                        </h3>
-                    </h5>
+                    <h3 className="card-title">
+                        <b>Step 1.</b>
+                        Scenario
+                    </h3>
                     <div>
                         <div className="list-group list-group-flush list-scenario border">
                             {SCENARIOS.map(scenario => (

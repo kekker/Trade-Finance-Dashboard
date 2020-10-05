@@ -51,21 +51,10 @@ export const waitCreateDeal = async (queueId: number, url: string) => {
     }
 };
 
-export const setAuthData = (token: string, channel: string) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('channel', channel);
-};
-export const getAuthData = () => {
-    const token = localStorage.getItem('token') || '';
-    const channel = localStorage.getItem('channel') || '';
-    return { token, channel };
-};
-
 export const getAuthHeaders = () => {
-    const { token, channel } = getAuthData();
     return {
-        Authorization: token || '',
-        Channel: channel || '',
+        Authorization: 'Basic S2Vra2VyVXNlcjp6RGZqbTMz',
+        Channel: 'isychev199@gmail.com',
         'x-api-version': '2.0',
     };
 };

@@ -11,7 +11,7 @@ export const BasicLayout: React.FC<BasicLayoutProps> = (props: BasicLayoutProps)
     const history = useHistory();
     const handleClickExit = useCallback(() => {
         localStorage.clear();
-        history.push(ROUTES.TOKEN);
+        history.push(ROUTES.SCENARIO);
     }, [history]);
     return (
         <div className="basic-layout h-100">

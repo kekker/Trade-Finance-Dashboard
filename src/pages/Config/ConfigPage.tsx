@@ -175,12 +175,10 @@ export const ConfigPage: React.FC = () => {
             <div className="card col-lg-8 col-md-12 col-sm-12">
                 <div className="card-body">
                     <div>
-                        <h5 className="card-title   ">
-                            <h3>
-                                <b>Step 3.</b>
-                                Configuring the scenario
-                            </h3>
-                        </h5>
+                        <h3 className="card-title   ">
+                            <b>Step 2.</b>
+                            Configuring the scenario
+                        </h3>
                         <div className="mb-3 pb-3 ">
                             <h5 className="card-title">Technology</h5>
                             <div>
