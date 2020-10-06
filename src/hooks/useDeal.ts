@@ -3,7 +3,7 @@ import axios from 'axios';
 import { fetchCurrentDeal, getAuthHeaders, getDealUid } from '../utils';
 import { Deal, RequestItem, Event } from '../types';
 
-const INTERVAL_DELAY = 10000;
+const INTERVAL_DELAY = 5000;
 export const useDeal = (url: string) => {
     const dealUid = getDealUid();
     const [requests, setStateRequests] = useState<RequestItem[]>([]);
